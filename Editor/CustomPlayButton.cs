@@ -24,12 +24,11 @@ namespace ASze.CustomPlayButton
     {
 #if UNITY_TOOLBAR_EXTENDER
         const string FOLDER_PATH = "Assets/Editor/CustomPlayButton/";
-        const string SETTING_PATH = FOLDER_PATH + "BookmarkSetting.asset";
+        // const string SETTING_PATH = FOLDER_PATH + "BookmarkSetting.asset";
         const string ICONS_PATH = "Packages/com.antonysze.custom-play-button/Editor/Icons/";
 
-        private static SceneBookmark bookmark = null;
+        // private static SceneBookmark bookmark = null;
         private static SceneAsset selectedScene = null;
-
 
         static GUIContent customSceneContent;
         static GUIContent gameSceneContent;
@@ -38,21 +37,26 @@ namespace ASze.CustomPlayButton
         static VisualElement toolbarElement;
         static SceneAsset lastScene = null;
 
-        public static SceneBookmark Bookmark
-        {
-            get
-            {
-                if (bookmark == null)
-                {
-                    bookmark = ScriptableObject.CreateInstance<SceneBookmark>();
-                    if (!Directory.Exists(FOLDER_PATH))
-                        Directory.CreateDirectory(FOLDER_PATH);
-                    AssetDatabase.CreateAsset(bookmark, SETTING_PATH);
-                    AssetDatabase.Refresh();
-                }
-                return bookmark;
-            }
-        }
+        // public static SceneBookmark Bookmark
+        // {
+        //     get
+        //     {
+        //         if (bookmark != null) return bookmark;
+        //
+        //         if (File.Exists(SETTING_PATH))
+        //         {
+        //             bookmark = AssetDatabase.LoadAssetAtPath<SceneBookmark>(SETTING_PATH);
+        //             return bookmark;
+        //         }
+        //
+        //         bookmark = ScriptableObject.CreateInstance<SceneBookmark>();
+        //         if (!Directory.Exists(FOLDER_PATH))
+        //             Directory.CreateDirectory(FOLDER_PATH);
+        //         AssetDatabase.CreateAsset(bookmark, SETTING_PATH);
+        //         AssetDatabase.Refresh();
+        //         return bookmark;
+        //     }
+        // }
 
         public static SceneAsset SelectedScene
         {
@@ -96,11 +100,11 @@ namespace ASze.CustomPlayButton
             ToolbarExtender.LeftToolbarGUI.Add(OnToolbarLeftGUI);
             EditorApplication.update += OnUpdate;
 
-            if (bookmark == null)
-            {
-                bookmark = AssetDatabase.LoadAssetAtPath<SceneBookmark>(SETTING_PATH);
-                Bookmark?.RemoveNullValue();
-            }
+            // if (bookmark == null)
+            // {
+            //     bookmark = AssetDatabase.LoadAssetAtPath<SceneBookmark>(SETTING_PATH);
+            //     Bookmark?.RemoveNullValue();
+            // }
 
             var savedScenePath = EditorPrefs.GetString(GetEditorPrefKey(), "");
             selectedScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(savedScenePath);
@@ -110,16 +114,16 @@ namespace ASze.CustomPlayButton
                 SelectedScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
             }
 
-            customSceneContent = CreateIconContent("PlaySceneButton.png", "d_UnityEditor.Timeline.TimelineWindow@2x", "Play Custom Scene");
-            gameSceneContent = CreateIconContent("PlayGameButton.png", "d_UnityEditor.GameView@2x", "Play Game Scene");
+            customSceneContent = CreateIconContent("PlaySceneButton.png", "d_UnityEditor.Timeline.TimelineWindow@2x", "Play Selected Scene");
+            gameSceneContent = CreateIconContent("PlayGameButton.png", "d_UnityEditor.GameView@2x", "Play First Scene");
         }
 
         static void OnToolbarLeftGUI()
         {
-            GUILayout.FlexibleSpace();
+            // GUILayout.FlexibleSpace();
 
             var sceneName = selectedScene != null ? selectedScene.name : "Select Scene...";
-            var selected = EditorGUILayout.DropdownButton(new GUIContent(sceneName), FocusType.Passive, GUILayout.Width(128.0f));
+            var selected = EditorGUILayout.DropdownButton(new GUIContent(sceneName), FocusType.Passive, GUILayout.Width(200.0f));
             if (Event.current.type == EventType.Repaint)
             {
                 buttonRect = GUILayoutUtility.GetLastRect();
