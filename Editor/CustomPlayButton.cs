@@ -114,8 +114,9 @@ namespace ASze.CustomPlayButton
                 SelectedScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
             }
 
-            customSceneContent = CreateIconContent("PlaySceneButton.png", "d_UnityEditor.Timeline.TimelineWindow@2x", "Play Selected Scene");
-            gameSceneContent = CreateIconContent("PlayGameButton.png", "d_UnityEditor.GameView@2x", "Play First Scene");
+            // customSceneContent = CreateIconContent("PlaySceneButton.png", "d_UnityEditor.Timeline.TimelineWindow@2x", "Play Selected Scene");
+            // gameSceneContent = CreateIconContent("PlayGameButton.png", "d_UnityEditor.GameView@2x", "Play First Scene");
+            customSceneContent = CreateIconContent("PlaySceneButton.png", "d_UnityEditor.GameView@2x", "Play Selected Scene");
         }
 
         static void OnToolbarLeftGUI()
