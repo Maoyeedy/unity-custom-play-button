@@ -3,26 +3,17 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using System.IO;
 using System.Reflection;
-
-#if UNITY_TOOLBAR_EXTENDER
-using UnityToolbarExtender;
-#else
+using Toolbox.Editor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
-#endif
 
-#if UNITY_2019_1_OR_NEWER
 using VisualElement = UnityEngine.UIElements.VisualElement;
-#else
-using VisualElement = UnityEngine.Experimental.UIElements.VisualElement;
-#endif
 
 namespace ASze.CustomPlayButton
 {
     [InitializeOnLoad]
     public static class CustomPlayButton
     {
-#if UNITY_TOOLBAR_EXTENDER
         const string FOLDER_PATH = "Assets/Editor/CustomPlayButton/";
         // const string SETTING_PATH = FOLDER_PATH + "BookmarkSetting.asset";
         const string ICONS_PATH = "Packages/com.antonysze.custom-play-button/Editor/Icons/";
@@ -30,8 +21,8 @@ namespace ASze.CustomPlayButton
         // private static SceneBookmark bookmark = null;
         private static SceneAsset selectedScene = null;
 
-        static GUIContent customSceneContent;
-        static GUIContent gameSceneContent;
+        static GUIContent selectedSceneContent;
+        static GUIContent firstSceneContent;
 
         static Rect buttonRect;
         static VisualElement toolbarElement;
@@ -97,7 +88,8 @@ namespace ASze.CustomPlayButton
 
         static CustomPlayButton()
         {
-            ToolbarExtender.LeftToolbarGUI.Add(OnToolbarLeftGUI);
+            // ToolbarExtender.LeftToolbarGUI.Add(OnToolbarLeftGUI);
+            ToolboxEditorToolbar.OnToolbarGui += OnToolbarLeftGUI;
             EditorApplication.update += OnUpdate;
 
             // if (bookmark == null)
@@ -115,8 +107,8 @@ namespace ASze.CustomPlayButton
             }
 
             // customSceneContent = CreateIconContent("PlaySceneButton.png", "d_UnityEditor.Timeline.TimelineWindow@2x", "Play Selected Scene");
-            // gameSceneContent = CreateIconContent("PlayGameButton.png", "d_UnityEditor.GameView@2x", "Play First Scene");
-            customSceneContent = CreateIconContent("PlaySceneButton.png", "d_UnityEditor.GameView@2x", "Play Selected Scene");
+            // firstSceneContent = CreateIconContent("PlayGameButton.png", "d_UnityEditor.GameView@2x", "Play First Scene");
+            selectedSceneContent = CreateIconContent("PlaySceneButton.png", "d_UnityEditor.GameView@2x", "Play Selected Scene");
         }
 
         static void OnToolbarLeftGUI()
@@ -135,7 +127,7 @@ namespace ASze.CustomPlayButton
                 PopupWindow.Show(buttonRect, new EditorSelectScenePopup());
             }
 
-            if (GUILayout.Button(customSceneContent, ToolbarStyles.commandButtonStyle))
+            if (GUILayout.Button(selectedSceneContent, ToolbarStyles.commandButtonStyle))
             {
                 if (selectedScene != null)
                 {
@@ -150,27 +142,28 @@ namespace ASze.CustomPlayButton
                 }
             }
 
-            if (GUILayout.Button(gameSceneContent, ToolbarStyles.commandButtonStyle))
-            {
-                if (EditorBuildSettings.scenes.Length > 0)
-                {
-                    var scenePath = EditorBuildSettings.scenes[0].path;
-                    var scene = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
-                    StartScene(scene);
-                }
-                else
-                {
-                    if (!EditorUtility.DisplayDialog(
-                        "Cannot play the game",
-                        "Please add the first scene in build setting in order to play the game.",
-                        "Ok", "Open build setting"))
-                    {
-                        EditorWindow.GetWindow(System.Type.GetType("UnityEditor.BuildPlayerWindow,UnityEditor"));
-                    }
-                    // Avoid error from GUILayout.EndHorizontal()
-                    GUILayout.BeginHorizontal();
-                }
-            }
+            // First scene button
+            // if (GUILayout.Button(gameSceneContent, ToolbarStyles.commandButtonStyle))
+            // {
+            //     if (EditorBuildSettings.scenes.Length > 0)
+            //     {
+            //         var scenePath = EditorBuildSettings.scenes[0].path;
+            //         var scene = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
+            //         StartScene(scene);
+            //     }
+            //     else
+            //     {
+            //         if (!EditorUtility.DisplayDialog(
+            //             "Cannot play the game",
+            //             "Please add the first scene in build setting in order to play the game.",
+            //             "Ok", "Open build setting"))
+            //         {
+            //             EditorWindow.GetWindow(System.Type.GetType("UnityEditor.BuildPlayerWindow,UnityEditor"));
+            //         }
+            //         // Avoid error from GUILayout.EndHorizontal()
+            //         GUILayout.BeginHorizontal();
+            //     }
+            // }
         }
 
         static void StartScene(SceneAsset scene)
@@ -258,33 +251,5 @@ namespace ASze.CustomPlayButton
         {
             return (Texture2D)EditorGUIUtility.Load(ICONS_PATH + path);
         }
-#else
-        static AddRequest request;
-
-        static CustomPlayButton()
-        {
-            if (!EditorUtility.DisplayDialog(
-                "Cannot activate Custom Play Button",
-                "Prerequisite package is needed for \"unity-custom-play-button\".\nPlease install package \"unity-toolbar-extender\"(https://github.com/marijnz/unity-toolbar-extender.git).",
-                "Ok", "Install package"))
-            {
-                request = Client.Add("https://github.com/marijnz/unity-toolbar-extender.git");
-                EditorApplication.update += Progress;
-            }
-        }
-
-        static void Progress()
-        {
-            if (request.IsCompleted)
-            {
-                if (request.Status == StatusCode.Success)
-                    Debug.Log("Installed: " + request.Result.packageId);
-                else if (request.Status >= StatusCode.Failure)
-                    Debug.Log(request.Error.message);
-
-                EditorApplication.update -= Progress;
-            }
-        }
-#endif
     }
 }

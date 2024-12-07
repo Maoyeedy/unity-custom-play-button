@@ -1,4 +1,4 @@
-#if UNITY_TOOLBAR_EXTENDER
+// #if UNITY_TOOLBAR_EXTENDER
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -239,4 +239,4 @@ namespace ASze.CustomPlayButton
         }
     }
 }
-#endif
+// #endif
